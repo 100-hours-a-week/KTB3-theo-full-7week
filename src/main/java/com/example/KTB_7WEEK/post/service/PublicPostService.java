@@ -140,7 +140,11 @@ public class PublicPostService {
     public BaseResponse<CreateCommentResponseDto> createComment(long postId, CreateCommentRequestDto req) {
         postRepository.findPostById(postId).orElseThrow(() -> new PostNotFoundException());
 
-        Comment toSave = new Comment(req.getUserId(), postId, req.getContent());
+        Comment toSave = new Comment.Builder()
+                .authorId(req.getUserId())
+                .postId(postId)
+                .content(req.getContent())
+                .build();
         Comment saved = postRepository.createComment(toSave).orElseThrow(() -> new CommentCreateException());
 
         return new BaseResponse(ResponseMessage.COMMENT_CREATE_SUCCESS,

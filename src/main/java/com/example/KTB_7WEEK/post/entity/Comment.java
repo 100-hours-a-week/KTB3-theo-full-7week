@@ -1,63 +1,49 @@
 package com.example.KTB_7WEEK.post.entity;
 
 
+import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
+@Entity
+@Getter
 public class Comment {
-    private long id = 0L;
-    private long postId = 0L;
-    private long userId = 0L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id", nullable = false)
+    private Long id = 0L;
+
+    @Column(name = "post_id", nullable = false)
+    private Long postId = 0L;
+
+    @Column(name = "author_id", nullable = false)
+    private Long authorId = 0L;
+
+    @Column(name = "content", nullable = false, length = 200)
     private String content = "";
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = createdAt;
+
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
     public Comment() {
     }
 
-    public Comment(long id, long postId, long userId, String content) {
-        this.id = id;
-        this.postId = postId;
-        this.userId = userId;
-        this.content = content;
-    }
-
-    public Comment(long userId, long postId, String content) {
-        this.userId = userId;
-        this.postId = postId;
-        this.content = content;
+    public Comment(Builder builder) {
+        this.id = builder.id;
+        this.postId = builder.postId;
+        this.authorId = builder.authorId;
+        this.content = builder.content;
     }
 
     public Comment(String content) {
         this.content = content;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public long getPostId() {
-        return postId;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
     }
 
     public void identify(long id) {
@@ -74,5 +60,36 @@ public class Comment {
 
     public void softDelete() {
         this.isDeleted = true;
+    }
+
+    public static class Builder {
+        private Long id = 0L;
+        private Long postId = 0L;
+        private Long authorId = 0L;
+        private String content = "";
+
+        public Builder id(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder postId(long postId) {
+            this.postId = postId;
+            return this;
+        }
+
+        public Builder authorId(long authorId) {
+            this.authorId = authorId;
+            return this;
+        }
+
+        public Builder content(String content) {
+            this.content = content;
+            return this;
+        }
+
+        public Comment build() {
+            return new Comment(this);
+        }
     }
 }
