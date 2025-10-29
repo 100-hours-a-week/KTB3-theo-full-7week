@@ -1,23 +1,50 @@
 package com.example.KTB_7WEEK.post.entity;
 
 
+import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Entity
+@Getter
 public class Post {
-    // id ~ category : User가 조회 수정 가능
-    private long id = 0L;
-    private long authorId = 0L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id", nullable = false)
+    private Long id = 0L;
+
+    @Column(name = "author_id", nullable = false)
+    private Long authorId = 0L;
+
+    @Column(name = "title", length = 26, nullable = false)
     private String title = "";
+
+    @Column(name = "article", nullable = false)
     private String article = "";
+
+    @Column(name = "article_image")
     private String articleImage = "";
+
+    @Column(name = "post_category", nullable = false)
+    @Enumerated(EnumType.STRING)
     private PostCategory category = PostCategory.NONE;
 
-    // User Invisible data, 서버 내부적으로 값 설정
-    private AtomicLong hit = new AtomicLong(0);
-    private AtomicLong like = new AtomicLong(0);
+    @Column(name = "hit", nullable = false)
+    private long hit = 0;
+
+    @Column(name = "post_like", nullable = false)
+    private long like = 0;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = this.createdAt;
+
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
     public Post() {
@@ -30,59 +57,6 @@ public class Post {
         this.article = builder.article;
         this.articleImage = builder.articleImage;
         this.category = builder.category;
-    }
-
-    public Post(long authorId, String title, String article, String articleImage, PostCategory category) {
-        this.authorId = authorId;
-        this.title = title;
-        this.article = article;
-        this.category = category;
-        this.articleImage = articleImage;
-
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public long getAuthorId() {
-        return authorId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getArticle() {
-        return article;
-    }
-
-    public PostCategory getCategory() {
-        return category;
-    }
-
-    public long getHit() {
-        return hit.get();
-    }
-
-    public long getLike() {
-        return like.get();
-    }
-
-    public String getArticleImage() {
-        return articleImage;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
     }
 
     public void identify(long id) {
@@ -114,11 +88,11 @@ public class Post {
     }
 
     public long increaseHit() {
-        return hit.getAndIncrement();
+        return ++hit;
     }
 
     public long increaseLike() {
-        return like.getAndIncrement();
+        return ++like;
     }
 
     public static class Builder {

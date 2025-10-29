@@ -1,15 +1,39 @@
 package com.example.KTB_7WEEK.user.entity;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.context.annotation.Primary;
+
 import java.time.LocalDateTime;
 
+@Entity
+@Getter
 public class User {
-    private long id = 0L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long id = 0L;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email = "";
+
+    @Column(name = "password", nullable = false, length = 20)
     private String password = "";
+
+    @Column(name = "nickname", nullable = false, length = 10)
     private String nickname = "";
+
+    @Column(name = "profile_image")
     private String profileImage = "";
+
+    @Column(name = "create_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = createdAt;
+
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
     public User() {
@@ -21,34 +45,6 @@ public class User {
         this.password = builder.password;
         this.nickname = builder.nickname;
         this.profileImage = builder.profileImage;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getProfileImage() {
-        return profileImage;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     public boolean isDeleted() {

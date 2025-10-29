@@ -1,5 +1,5 @@
 application:
-  name: KTB_5WEEK
+  name: KTB_7WEEK
   auth:
     secret: secretKey
     token:
@@ -14,3 +14,21 @@ springdoc:
     title: My API Specification
     version: v1.0.0
     description: This document descript my project how to use
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/KTB_7WEEK?serverTimezone=UTC&useSSL=false
+    username: root
+    password: Hss@857942
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create   # 개발 중에는 create / create-drop / update 중 선택
+    properties:
+      hibernate:
+#        format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
