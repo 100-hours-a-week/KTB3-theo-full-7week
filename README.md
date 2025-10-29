@@ -1,6 +1,6 @@
-# KTB3-theo-full-5week
+# KTB3-theo-full-7week
 
-## 5주차 과제
+## 7주차 과제
 
-4주차 SOLID원칙을 기반으로 한 REST API 리팩토링 
+5주차 과제 산출 REST API Server + JPA와 연관관계 매핑
 
