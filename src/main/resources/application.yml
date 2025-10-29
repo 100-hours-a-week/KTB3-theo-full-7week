@@ -1,0 +1,16 @@
+application:
+  name: KTB_5WEEK
+  auth:
+    secret: secretKey
+    token:
+      expire: 10
+
+springdoc:
+  api-docs:
+    path: /api-docs # API ?? ?? (???: /v3/api-docs)
+  swagger-ui:
+    path: /swagger-ui.html # Swagger UI ??
+  info:
+    title: My API Specification
+    version: v1.0.0
+    description: This document descript my project how to use
