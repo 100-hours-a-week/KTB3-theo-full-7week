@@ -38,7 +38,7 @@ public class FindCommentResponseDto {
     public static FindCommentResponseDto toDto(Comment comment) {
         FindCommentResponseDto dto = new FindCommentResponseDto();
         dto.id = comment.getId();
-        dto.userId = comment.getUserId();
+        dto.userId = comment.getAuthorId();
         dto.content = comment.getContent();
         dto.created_at = comment.getCreatedAt()
                 .format(DateTimeFormatter.ofPattern(DateTimePattern.DEFAULT_DATE_TIME));

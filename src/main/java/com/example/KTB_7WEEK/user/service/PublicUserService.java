@@ -5,24 +5,22 @@ import com.example.KTB_7WEEK.app.aop.aspect.log.Loggable;
 import com.example.KTB_7WEEK.app.response.BaseResponse;
 import com.example.KTB_7WEEK.app.response.ResponseMessage;
 import com.example.KTB_7WEEK.user.entity.User;
-import com.example.KTB_7WEEK.user.repository.user.UserRepository;
-import com.example.KTB_7WEEK.user.repository.user.email.EmailRepository;
+import com.example.KTB_7WEEK.user.repository.user.PublicUserRepository;
 import com.example.KTB_7WEEK.user.dto.request.*;
 import com.example.KTB_7WEEK.user.dto.response.*;
 import com.example.KTB_7WEEK.user.exception.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 @Service
+@Transactional
 public class PublicUserService {
-    private final UserRepository userRepository;
-    private final EmailRepository emailRepository;
+    private final PublicUserRepository publicUserRepository;
 
     // 생성자 DI
-    public PublicUserService(UserRepository publicUserRepository, EmailRepository emailRepository) {
-        this.userRepository = publicUserRepository;
-        this.emailRepository = emailRepository;
+    public PublicUserService(PublicUserRepository publicUserRepository) {
+        this.publicUserRepository = publicUserRepository;
     }
 
     /**
@@ -31,39 +29,40 @@ public class PublicUserService {
     // 회원가입
     @Loggable
     public BaseResponse<RegistUserResponseDto> register(RegistUserRequestDto req) {
-        String email = req.getEmail();
-        String nickname = req.getNickname();
+        try {
+            String email = req.getEmail();
+            String nickname = req.getNickname();
 
-        if (!checkEmailAvailability(email)) throw new EmailAlreadyRegisteredException();
-        if (!checkNicknameAvailability(nickname)) throw new NicknameAlreadyRegisteredException();
+            User toSave = new User.Builder()
+                    .email(email)
+                    .password(req.getPassword())
+                    .nickname(req.getNickname())
+                    .profileImage(req.getProfileImage())
+                    .build();
 
+            User saved = publicUserRepository.save(toSave);
+            return new BaseResponse(ResponseMessage.USER_REGISTER_SUCCESS, RegistUserResponseDto.toDto(saved));
+        } catch (Exception e) {
+            System.out.println(e);
 
-        User toSave = new User.Builder()
-                .email(email)
-                .password(req.getPassword())
-                .nickname(req.getNickname())
-                .profileImage(req.getProfileImage())
-                .build();
-
-        User saved = userRepository.regist(toSave).orElseThrow(() -> new UserCreateException());
-        emailRepository.mapUserByEmail(saved).orElseThrow(() -> new FailUserEmailMappingException());
-        return new BaseResponse(ResponseMessage.USER_REGISTER_SUCCESS, RegistUserResponseDto.toDto(saved));
-
+        }
+//        if (!checkEmailAvailability(email)) throw new EmailAlreadyRegisteredException();
+//        if (!checkNicknameAvailability(nickname)) throw new NicknameAlreadyRegisteredException();
+        throw new UserCreateException();
     }
 
     // 회원정보 조회
     @Loggable
     public BaseResponse<FindUserResponseDto> findById(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        User user = publicUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         return new BaseResponse(ResponseMessage.USERINFO_LOAD_SUCCESS, FindUserResponseDto.toDto(user));
     }
 
     // 회원정보 삭제
     @Loggable
     public BaseResponse deleteById(long id) {
-        User toDelete = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
-        User deleted = userRepository.deleteById(id).orElseThrow(() -> new UserDeleteException());
-        emailRepository.deleteUserByEmail(deleted.getEmail()).orElseThrow(() -> new UserEmailMappingDeleteException());
+        User toDelete = publicUserRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
+        publicUserRepository.deleteById(id);
 
         return new BaseResponse(ResponseMessage.USER_DELETE_SUCCESS, new User());
     }
@@ -100,11 +99,11 @@ public class PublicUserService {
 
         if (!checkNicknameAvailability(nickname)) throw new NicknameAlreadyRegisteredException();
 
-        User toUpdate = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        User toUpdate = publicUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         toUpdate.updateNickname(nickname);
+        toUpdate.updateNowTime();
 
-        User updated = userRepository.updateById(userId, toUpdate).orElseThrow(() -> new NicknameUpdateException());
-
+        User updated = publicUserRepository.save(toUpdate);
         return new BaseResponse(ResponseMessage.NICKNAME_EDIT_SUCCESS, UpdateNicknameResponseDto.toDto(updated));
     }
 
@@ -113,12 +112,11 @@ public class PublicUserService {
     public BaseResponse changePassword(long userId, PasswordChangeRequestDto req) {
         String password = req.getPassword();
 
-        User toUpdate = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        User toUpdate = publicUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         toUpdate.updatePassword(password);
+        toUpdate.updateNowTime();
 
-        User updated = userRepository.updateById(userId, toUpdate).orElseThrow(() -> new UserUpdateException());
-
-        return new BaseResponse(ResponseMessage.PASSWORD_CHANGE_SUCCESS, UpdatePasswordResponseDto.toDto(updated.getId()));
+        return new BaseResponse(ResponseMessage.PASSWORD_CHANGE_SUCCESS, UpdatePasswordResponseDto.toDto(toUpdate.getId()));
     }
 
     /**
@@ -126,17 +124,11 @@ public class PublicUserService {
      **/
     // 닉네임 중복 검사
     private boolean checkNicknameAvailability(String nickname) {
-        List<User> users = userRepository.findAll();
-        for (User user : users) {
-            if (user.getNickname().equals(nickname)) {
-                return false;
-            }
-        }
-        return true;
+        return !publicUserRepository.findByNickname(nickname).isPresent();
     }
 
     // 이메일 중복 검사
     private boolean checkEmailAvailability(String email) {
-        return !emailRepository.findByEmail(email).isPresent();
+        return !publicUserRepository.findByEmail(email).isPresent();
     }
 }

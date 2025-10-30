@@ -21,10 +21,13 @@ spring:
     username: root
     password: Hss@857942
     driver-class-name: com.mysql.cj.jdbc.Driver
+  output:
+    ansi:
+      enabled: always
 
   jpa:
     hibernate:
-      ddl-auto: create   # 개발 중에는 create / create-drop / update 중 선택
+      ddl-auto: none   # 개발 중에는 create / create-drop / update 중 선택
     properties:
       hibernate:
 #        format_sql: true

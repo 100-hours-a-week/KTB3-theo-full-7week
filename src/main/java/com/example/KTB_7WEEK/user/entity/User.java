@@ -1,18 +1,19 @@
 package com.example.KTB_7WEEK.user.entity;
 
+import com.example.KTB_7WEEK.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.context.annotation.Primary;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false, unique = true)
     private Long id = 0L;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -21,13 +22,13 @@ public class User {
     @Column(name = "password", nullable = false, length = 20)
     private String password = "";
 
-    @Column(name = "nickname", nullable = false, length = 10)
+    @Column(name = "nickname", nullable = false, length = 10, unique = true)
     private String nickname = "";
 
     @Column(name = "profile_image")
     private String profileImage = "";
 
-    @Column(name = "create_at", nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at", nullable = false)
@@ -35,6 +36,9 @@ public class User {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "user")
+    private List<Post> posts = new ArrayList<>();
 
     public User() {
     }
@@ -55,7 +59,7 @@ public class User {
         this.id = id;
     }
 
-    public void updateNow() {
+    public void updateNowTime() {
         this.updatedAt = LocalDateTime.now();
     }
 

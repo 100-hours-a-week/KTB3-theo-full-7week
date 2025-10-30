@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,7 +59,9 @@ public interface UserApiDoc {
                             """)
             })),
     })
-    public ResponseEntity<BaseResponse> findByPublicUserId(Long userId);
+    public ResponseEntity<BaseResponse> findByPublicUserId(@PathVariable
+                                                           @NotNull
+                                                           @Positive Long userId);
 
     @Operation(summary = "회원가입", description = "이메일/비밀번호/닉네임/프로필이미지를 입력받아 새로운 회원을 생성합니다.")
     @ApiResponses({
@@ -119,7 +124,7 @@ public interface UserApiDoc {
                             """)
             })),
     })
-    public ResponseEntity<BaseResponse> createPublicUser(@RequestBody RegistUserRequestDto request);
+    public ResponseEntity<BaseResponse> createPublicUser(@RequestBody @Valid RegistUserRequestDto request);
 
     @Operation(summary = "닉네임 중복 확인", description = "사용중인 닉네임인지 확인합니다.")
     @ApiResponses({
@@ -158,7 +163,8 @@ public interface UserApiDoc {
                             """)
             })),
     })
-    public ResponseEntity<BaseResponse> doubleCheckNickname(@RequestBody CheckNicknameAvailabilityRequestDto request);
+    public ResponseEntity<BaseResponse> doubleCheckNickname(@RequestBody
+                                                            @Valid CheckNicknameAvailabilityRequestDto request);
 
     @Operation(summary = "이메일 중복 확인", description = "사용중인 이메일인지 확인합니다.")
     @ApiResponses({
@@ -197,7 +203,8 @@ public interface UserApiDoc {
                             """)
             })),
     })
-    public ResponseEntity<BaseResponse> doubleCheckEmail(@RequestBody CheckEmailAvailabilityRequestDto request);
+    public ResponseEntity<BaseResponse> doubleCheckEmail(@RequestBody
+                                                         @Valid CheckEmailAvailabilityRequestDto request);
 
 
     @Operation(summary = "비밀번호 수정", description = "특정 회원의 PK를 통해 비밀번호를 수정합니다.")
@@ -252,8 +259,11 @@ public interface UserApiDoc {
                             """)
             })),
     })
-    public ResponseEntity<BaseResponse> changePassword(@PathVariable("userId") Long userId,
-                                                       @RequestBody PasswordChangeRequestDto request);
+    public ResponseEntity<BaseResponse> changePassword(@PathVariable("userId")
+                                                       @NotNull
+                                                       @Positive Long userId,
+                                                       @RequestBody
+                                                       @Valid PasswordChangeRequestDto request);
 
 
     @Operation(summary = "닉네임 수정", description = "특정 회원의 PK 닉네임을 수정합니다.")
@@ -318,8 +328,11 @@ public interface UserApiDoc {
                             """)
             })),
     })
-    public ResponseEntity<BaseResponse> editNickName(@PathVariable("userId") Long userId,
-                                                     @RequestBody NicknameEditRequestDto request);
+    public ResponseEntity<BaseResponse> editNickName(@PathVariable("userId")
+                                                     @NotNull
+                                                     @Positive Long userId,
+                                                     @RequestBody
+                                                     @Valid NicknameEditRequestDto request);
 
 
     @Operation(summary = "회원 삭제", description = "특정 회원 PK를 통해 회원을 삭제합니다.")
@@ -353,5 +366,7 @@ public interface UserApiDoc {
                             """)
             })),
     })
-    public ResponseEntity<BaseResponse> deletePublicUser(@PathVariable("userId") Long userId);
+    public ResponseEntity<BaseResponse> deletePublicUser(@PathVariable("userId")
+                                                         @NotNull
+                                                         @Positive Long userId);
 }

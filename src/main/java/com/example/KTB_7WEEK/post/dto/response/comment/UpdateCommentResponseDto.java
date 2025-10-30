@@ -44,7 +44,7 @@ public class UpdateCommentResponseDto {
         UpdateCommentResponseDto dto = new UpdateCommentResponseDto();
         dto.id = comment.getId();
         dto.postId = comment.getPostId();
-        dto.userId = comment.getUserId();
+        dto.userId = comment.getAuthorId();
         dto.content = comment.getContent();
         dto.createAt = comment.getCreatedAt()
                 .format(DateTimeFormatter.ofPattern(DateTimePattern.DEFAULT_DATE_TIME));

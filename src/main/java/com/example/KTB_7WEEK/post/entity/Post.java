@@ -1,6 +1,7 @@
 package com.example.KTB_7WEEK.post.entity;
 
 
+import com.example.KTB_7WEEK.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -13,7 +14,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "post_id", nullable = false, unique = true)
     private Long id = 0L;
 
     @Column(name = "author_id", nullable = false)
@@ -28,7 +29,7 @@ public class Post {
     @Column(name = "article_image")
     private String articleImage = "";
 
-    @Column(name = "post_category", nullable = false)
+    @Column(name = "category", nullable = false)
     @Enumerated(EnumType.STRING)
     private PostCategory category = PostCategory.NONE;
 
@@ -46,6 +47,10 @@ public class Post {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Post() {
     }
