@@ -100,6 +100,12 @@ public class Post {
         return ++like;
     }
 
+    // 연관관계 편의 메소드
+    public void postByUser(User user) {
+        this.user = user;
+        user.getPosts().add(this);
+    }
+
     public static class Builder {
         private long id = 0L;
         private long authorId = 0L;

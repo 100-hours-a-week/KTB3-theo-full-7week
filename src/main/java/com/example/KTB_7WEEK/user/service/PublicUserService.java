@@ -9,6 +9,10 @@ import com.example.KTB_7WEEK.user.repository.user.PublicUserRepository;
 import com.example.KTB_7WEEK.user.dto.request.*;
 import com.example.KTB_7WEEK.user.dto.response.*;
 import com.example.KTB_7WEEK.user.exception.*;
+import com.fasterxml.jackson.databind.util.ExceptionUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,30 +29,30 @@ public class PublicUserService {
 
     /**
      * User Service Business Logic & Convert <BaseResponse> Method
+     * <p>
+     * TODO
+     * 1. register 메소드 이메일, 닉네임 중복체크 하는 동안 다른 트랜잭션이 값 바꾸면 중간에 검사 실패할 수 있다.
+     * 2. 비밀번호 암호화 BCrypt
      **/
     // 회원가입
     @Loggable
     public BaseResponse<RegistUserResponseDto> register(RegistUserRequestDto req) {
-        try {
-            String email = req.getEmail();
-            String nickname = req.getNickname();
+        String email = req.getEmail();
+        String nickname = req.getNickname();
 
-            User toSave = new User.Builder()
-                    .email(email)
-                    .password(req.getPassword())
-                    .nickname(req.getNickname())
-                    .profileImage(req.getProfileImage())
-                    .build();
+        if (publicUserRepository.existsByEmail(email)) throw new EmailAlreadyRegisteredException();
+        if (publicUserRepository.existsByNickname(nickname)) throw new NicknameAlreadyRegisteredException();
 
-            User saved = publicUserRepository.save(toSave);
-            return new BaseResponse(ResponseMessage.USER_REGISTER_SUCCESS, RegistUserResponseDto.toDto(saved));
-        } catch (Exception e) {
-            System.out.println(e);
+        User toSave = new User.Builder()
+                .email(email)
+                .password(req.getPassword())
+                .nickname(req.getNickname())
+                .profileImage(req.getProfileImage())
+                .build();
 
-        }
-//        if (!checkEmailAvailability(email)) throw new EmailAlreadyRegisteredException();
-//        if (!checkNicknameAvailability(nickname)) throw new NicknameAlreadyRegisteredException();
-        throw new UserCreateException();
+        User saved = publicUserRepository.save(toSave);
+        return new BaseResponse(ResponseMessage.USER_REGISTER_SUCCESS, RegistUserResponseDto.toDto(saved));
+
     }
 
     // 회원정보 조회
@@ -71,7 +75,7 @@ public class PublicUserService {
     @Loggable
     public BaseResponse<CheckNicknameAvailabilityResponseDto> doubleCheckNickname(CheckNicknameAvailabilityRequestDto req) {
         String nickname = req.getNickname();
-        if (!checkNicknameAvailability(nickname)) {
+        if (!publicUserRepository.existsByNickname(nickname)) {
             return new BaseResponse(ResponseMessage.NICKNAME_IS_NOT_AVAILABLE,
                     CheckNicknameAvailabilityResponseDto.toDto(nickname, false));
         }
@@ -83,7 +87,7 @@ public class PublicUserService {
     @Loggable
     public BaseResponse<CheckEmailAvailabilityResponseDto> doubleCheckEmail(CheckEmailAvailabilityRequestDto req) {
         String email = req.getEmail();
-        if (!checkEmailAvailability(email)) {
+        if (!publicUserRepository.existsByEmail(email)) {
             return new BaseResponse(ResponseMessage.EMAIL_IS_NOT_AVAILABLE,
                     CheckEmailAvailabilityResponseDto.toDto(email, false));
         }
@@ -97,7 +101,7 @@ public class PublicUserService {
     public BaseResponse<UpdateNicknameResponseDto> editNickname(long userId, NicknameEditRequestDto req) {
         String nickname = req.getNickname();
 
-        if (!checkNicknameAvailability(nickname)) throw new NicknameAlreadyRegisteredException();
+        if (publicUserRepository.existsByNickname(nickname)) throw new NicknameAlreadyRegisteredException();
 
         User toUpdate = publicUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         toUpdate.updateNickname(nickname);
@@ -119,16 +123,4 @@ public class PublicUserService {
         return new BaseResponse(ResponseMessage.PASSWORD_CHANGE_SUCCESS, UpdatePasswordResponseDto.toDto(toUpdate.getId()));
     }
 
-    /**
-     * User Service Common Function
-     **/
-    // 닉네임 중복 검사
-    private boolean checkNicknameAvailability(String nickname) {
-        return !publicUserRepository.findByNickname(nickname).isPresent();
-    }
-
-    // 이메일 중복 검사
-    private boolean checkEmailAvailability(String email) {
-        return !publicUserRepository.findByEmail(email).isPresent();
-    }
 }
