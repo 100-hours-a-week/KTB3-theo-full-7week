@@ -20,6 +20,9 @@ import com.example.KTB_7WEEK.post.entity.Post;
 import com.example.KTB_7WEEK.app.util.paginationPolicy.CommentPaginationPolicy;
 import com.example.KTB_7WEEK.app.util.paginationPolicy.PostPaginationPolicy;
 import com.example.KTB_7WEEK.post.repository.PostRepository;
+import com.example.KTB_7WEEK.user.entity.User;
+import com.example.KTB_7WEEK.user.exception.UserNotFoundException;
+import com.example.KTB_7WEEK.user.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +34,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PostService {
+    private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository,
+    public PostService(UserRepository userRepository,
+                       PostRepository postRepository,
                        CommentRepository commentRepository) {
+        this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
     }
@@ -46,8 +52,10 @@ public class PostService {
     // 게시글 생성
     @Loggable
     public BaseResponse<CreateCommentResponseDto> createPost(CreatePostRequestDto req) {
+        User author = userRepository.findById(req.getAuthorId()).orElseThrow(() -> new UserNotFoundException());
+
         Post toSave = new Post.Builder()
-                .authorId(req.getAuthorId())
+                .author(author)
                 .title(req.getTitle())
                 .article(req.getArticle())
                 .articleImage(req.getArticleImage())
@@ -145,9 +153,10 @@ public class PostService {
         if (postRepository.existsById(postId)) {
             throw new PostNotFoundException();
         }
+
         Post findPost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException());
         Comment toSave = new Comment.Builder()
-                .author(findPost.getUser())
+                .author(findPost.getAuthor())
                 .post(findPost)
                 .content(req.getContent())
                 .build();

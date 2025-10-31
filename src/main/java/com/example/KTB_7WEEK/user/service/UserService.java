@@ -16,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class UserService {
-    private final UserRepository publicUserRepository;
+    private final UserRepository userRepository;
 
     // 생성자 DI
-    public UserService(UserRepository publicUserRepository) {
-        this.publicUserRepository = publicUserRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     /**
@@ -36,8 +36,8 @@ public class UserService {
         String email = req.getEmail();
         String nickname = req.getNickname();
 
-        if (publicUserRepository.existsByEmail(email)) throw new EmailAlreadyRegisteredException();
-        if (publicUserRepository.existsByNickname(nickname)) throw new NicknameAlreadyRegisteredException();
+        if (userRepository.existsByEmail(email)) throw new EmailAlreadyRegisteredException();
+        if (userRepository.existsByNickname(nickname)) throw new NicknameAlreadyRegisteredException();
 
         User toSave = new User.Builder()
                 .email(email)
@@ -46,7 +46,7 @@ public class UserService {
                 .profileImage(req.getProfileImage())
                 .build();
 
-        User saved = publicUserRepository.save(toSave);
+        User saved = userRepository.save(toSave);
         return new BaseResponse(ResponseMessage.USER_REGISTER_SUCCESS, RegistUserResponseDto.toDto(saved));
 
     }
@@ -54,15 +54,15 @@ public class UserService {
     // 회원정보 조회
     @Loggable
     public BaseResponse<FindUserResponseDto> findById(long userId) {
-        User user = publicUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         return new BaseResponse(ResponseMessage.USERINFO_LOAD_SUCCESS, FindUserResponseDto.toDto(user));
     }
 
     // 회원정보 삭제
     @Loggable
     public BaseResponse deleteById(long id) {
-        User toDelete = publicUserRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
-        publicUserRepository.deleteById(id);
+        User toDelete = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
+        userRepository.deleteById(id);
 
         return new BaseResponse(ResponseMessage.USER_DELETE_SUCCESS, new User());
     }
@@ -71,7 +71,7 @@ public class UserService {
     @Loggable
     public BaseResponse<CheckNicknameAvailabilityResponseDto> doubleCheckNickname(CheckNicknameAvailabilityRequestDto req) {
         String nickname = req.getNickname();
-        if (!publicUserRepository.existsByNickname(nickname)) {
+        if (userRepository.existsByNickname(nickname)) {
             return new BaseResponse(ResponseMessage.NICKNAME_IS_NOT_AVAILABLE,
                     CheckNicknameAvailabilityResponseDto.toDto(nickname, false));
         }
@@ -83,7 +83,7 @@ public class UserService {
     @Loggable
     public BaseResponse<CheckEmailAvailabilityResponseDto> doubleCheckEmail(CheckEmailAvailabilityRequestDto req) {
         String email = req.getEmail();
-        if (!publicUserRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(email)) {
             return new BaseResponse(ResponseMessage.EMAIL_IS_NOT_AVAILABLE,
                     CheckEmailAvailabilityResponseDto.toDto(email, false));
         }
@@ -97,13 +97,13 @@ public class UserService {
     public BaseResponse<UpdateNicknameResponseDto> editNickname(long userId, NicknameEditRequestDto req) {
         String nickname = req.getNickname();
 
-        if (publicUserRepository.existsByNickname(nickname)) throw new NicknameAlreadyRegisteredException();
+        if (userRepository.existsByNickname(nickname)) throw new NicknameAlreadyRegisteredException();
 
-        User toUpdate = publicUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        User toUpdate = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         toUpdate.updateNickname(nickname);
         toUpdate.updateNowTime();
 
-        User updated = publicUserRepository.save(toUpdate);
+        User updated = userRepository.save(toUpdate);
         return new BaseResponse(ResponseMessage.NICKNAME_EDIT_SUCCESS, UpdateNicknameResponseDto.toDto(updated));
     }
 
@@ -112,7 +112,7 @@ public class UserService {
     public BaseResponse changePassword(long userId, PasswordChangeRequestDto req) {
         String password = req.getPassword();
 
-        User toUpdate = publicUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        User toUpdate = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         toUpdate.updatePassword(password);
         toUpdate.updateNowTime();
 

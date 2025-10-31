@@ -52,7 +52,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User author;
 
     @OneToMany
     private List<Comment> comments = new ArrayList<>();
@@ -62,7 +62,7 @@ public class Post {
 
     public Post(Builder builder) {
         this.id = builder.id;
-        this.authorId = builder.authorId;
+        this.author = builder.author;
         this.title = builder.title;
         this.article = builder.article;
         this.articleImage = builder.articleImage;
@@ -106,14 +106,14 @@ public class Post {
     }
 
     // 연관관계 편의 메소드
-    public void postByUser(User user) {
-        this.user = user;
-        user.getPosts().add(this);
+    public void postByAuthor(User author) {
+        this.author = author;
+        author.getPosts().add(this);
     }
 
     public static class Builder {
         private long id = 0L;
-        private long authorId = 0L;
+        private User author = new User();
         private String title = "";
         private String article = "";
         private String articleImage = "";
@@ -124,8 +124,8 @@ public class Post {
             return this;
         }
 
-        public Builder authorId(long authorId) {
-            this.authorId = authorId;
+        public Builder author(User author) {
+            this.author = author;
             return this;
         }
 

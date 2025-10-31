@@ -90,7 +90,6 @@ public class TokenService {
             long exp = ((Number) payload.get("exp")).longValue();
             if (exp < now) return Optional.ofNullable(false);
 
-//            String verifyString = payload.get("sub").toString();
             return Optional.ofNullable(false);
         } catch (Exception e) {
             throw new IllegalStateException(e);
