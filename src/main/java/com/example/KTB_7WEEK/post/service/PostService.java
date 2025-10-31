@@ -23,6 +23,10 @@ import com.example.KTB_7WEEK.post.repository.PostRepository;
 import com.example.KTB_7WEEK.user.entity.User;
 import com.example.KTB_7WEEK.user.exception.UserNotFoundException;
 import com.example.KTB_7WEEK.user.repository.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,26 +74,22 @@ public class PostService {
     // TODO: JPA 페이지네이션 구현
     @Loggable
     public BaseResponse<FindPostsResponseDto> findPosts(int page) {
-        List<Post> posts = postRepository.findAll();
-        int totalPages = posts.size() / PostPaginationPolicy.DEFAULT.limit();
-        totalPages = posts.size() % PostPaginationPolicy.DEFAULT.limit() > 0 ?
-                totalPages + 1 : totalPages;
+        int size = 10;
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Post> posts = postRepository.findAll(pageable);
 
-        int totalCount = posts.size();
-        int postPerPage = PostPaginationPolicy.DEFAULT.limit();
-        int currentPage = page;
-        boolean hasNext = totalPages > currentPage;
-
-        List<FindPostResponseDto> postDtoList = posts.stream()
-                .filter(PostPaginationPolicy.DEFAULT.predicate())
-                .sorted(PostPaginationPolicy.DEFAULT.comparator())
-                .skip(PostPaginationPolicy.DEFAULT.offset(page))
-                .limit(PostPaginationPolicy.DEFAULT.limit())
-                .map((post) -> FindPostResponseDto.toDto(post))
+        long totalElements = posts.getTotalElements();
+        long currentPage = page;
+        long totalPages = posts.getTotalPages();
+        boolean hasNext = posts.hasNext();
+        List<FindPostResponseDto> contents = posts.getContent()
+                .stream()
+                .map((p) -> FindPostResponseDto.toDto(p))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         return new BaseResponse(ResponseMessage.POSTS_LOAD_SUCCESS,
-                FindPostsResponseDto.toDto(totalPages, totalCount, postPerPage, currentPage, hasNext, postDtoList));
+                FindPostsResponseDto.toDto(totalPages, totalElements, size, currentPage, hasNext, contents));
     }
 
     // 게시글 조회

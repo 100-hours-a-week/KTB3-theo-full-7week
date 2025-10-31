@@ -51,12 +51,4 @@ public class CreatePostRequestDto {
         return category;
     }
 
-    @Override
-    public String toString() {
-        return "authorId : " + authorId
-                + " / title : " + title
-                + " / article : " + article
-                + " / articleImage : " + articleImage
-                + " / category : " + category;
-    }
 }

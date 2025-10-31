@@ -6,37 +6,17 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 
 public enum PostPaginationPolicy implements PaginationPolicy {
-    DEFAULT(10,
-            Comparator.comparing(Post::getCreatedAt).thenComparing(Post::getId),
-            post -> !post.isDeleted());
+    DEFAULT(10);
 
-    private final int limit;
-    private final Comparator<Post> comparator;
-    private final Predicate<Post> predicate;
+    private final int size;
 
-    PostPaginationPolicy(int limit, Comparator<Post> comparator, Predicate<Post> predicate) {
-        this.limit = limit;
-        this.comparator = comparator;
-        this.predicate = predicate;
+    PostPaginationPolicy(int size) {
+        this.size = size;
     }
 
     @Override
-    public int limit() {
-        return this.limit;
+    public int size() {
+        return this.size;
     }
 
-    @Override
-    public Comparator<Post> comparator() {
-        return this.comparator;
-    }
-
-    @Override
-    public Predicate<Post> predicate() {
-        return this.predicate;
-    }
-
-    @Override
-    public long offset(int page) {
-        return (page - 1) * limit;
-    }
 }

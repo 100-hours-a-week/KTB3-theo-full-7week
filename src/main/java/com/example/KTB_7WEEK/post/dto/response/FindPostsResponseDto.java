@@ -3,29 +3,29 @@ package com.example.KTB_7WEEK.post.dto.response;
 import java.util.List;
 
 public class FindPostsResponseDto {
-    private int totalPages;
-    private int totalCount;
-    private int postPerPage;
-    private int currentPage;
+    private long totalPages;
+    private long totalElements;
+    private long size;
+    private long currentPage;
     private boolean hasNext;
-    private List<FindPostResponseDto> posts;
+    private List<FindPostResponseDto> contents;
 
     public FindPostsResponseDto() {
     }
 
-    public int getTotalPages() {
+    public long getTotalPages() {
         return totalPages;
     }
 
-    public int getTotalCount() {
-        return totalCount;
+    public long getTotalElements() {
+        return totalElements;
     }
 
-    public int getPostPerPage() {
-        return postPerPage;
+    public long getSize() {
+        return size;
     }
 
-    public int getCurrentPage() {
+    public long getCurrentPage() {
         return currentPage;
     }
 
@@ -33,20 +33,20 @@ public class FindPostsResponseDto {
         return hasNext;
     }
 
-    public List<FindPostResponseDto> getPosts() {
-        return posts;
+    public List<FindPostResponseDto> getContents() {
+        return contents;
     }
 
-    public static FindPostsResponseDto toDto(int totalPages, int totalCount, int postPerPage,
-                                             int currentPage, boolean hasNext,
-                                             List<FindPostResponseDto> posts) {
+    public static FindPostsResponseDto toDto(long totalPages, long totalElements, long size,
+                                             long currentPage, boolean hasNext,
+                                             List<FindPostResponseDto> contents) {
         FindPostsResponseDto dto = new FindPostsResponseDto();
         dto.totalPages = totalPages;
-        dto.totalCount = totalCount;
-        dto.postPerPage = postPerPage;
+        dto.totalElements = totalElements;
+        dto.size = size;
         dto.currentPage = currentPage;
         dto.hasNext = hasNext;
-        dto.posts = posts;
+        dto.contents = contents;
 
         return dto;
     }
