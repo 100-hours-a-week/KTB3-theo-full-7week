@@ -1,7 +1,9 @@
 package com.example.KTB_7WEEK.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 public class LoginRequestDto {
     @Schema(description = "로그인 요청 이메일", example = "test@test.com")
     private String email;

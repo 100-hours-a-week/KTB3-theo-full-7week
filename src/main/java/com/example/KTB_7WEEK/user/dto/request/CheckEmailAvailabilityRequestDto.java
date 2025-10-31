@@ -3,7 +3,9 @@ package com.example.KTB_7WEEK.user.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 public class CheckEmailAvailabilityRequestDto {
     @NotBlank(message = "이메일은 필수 입력입니다.")
     @Email(message = "이메일 형식이 맞지 않습니다.")

@@ -4,7 +4,9 @@ import com.example.KTB_7WEEK.post.entity.PostCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 public class UpdateMyPostRequestDto {
 
     @NotBlank(message = "제목은 필수 입력입니다.")
