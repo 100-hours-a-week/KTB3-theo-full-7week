@@ -4,7 +4,7 @@ import com.example.KTB_7WEEK.swagger.controller.post.PostApiDoc;
 import com.example.KTB_7WEEK.post.dto.request.CreatePostRequestDto;
 import com.example.KTB_7WEEK.post.dto.request.comment.UpdateCommentRequestDto;
 import com.example.KTB_7WEEK.app.response.BaseResponse;
-import com.example.KTB_7WEEK.post.service.PublicPostService;
+import com.example.KTB_7WEEK.post.service.PostService;
 import com.example.KTB_7WEEK.post.dto.request.UpdateMyPostRequestDto;
 import com.example.KTB_7WEEK.post.dto.request.comment.CreateCommentRequestDto;
 
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/post")
 public class PublicPostController implements PostApiDoc {
 
-    private final PublicPostService publicPostService;
+    private final PostService publicPostService;
 
-    public PublicPostController(PublicPostService publicPostService) {
+    public PublicPostController(PostService publicPostService) {
         this.publicPostService = publicPostService;
     }
 

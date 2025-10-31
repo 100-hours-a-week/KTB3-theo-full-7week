@@ -1,8 +1,10 @@
 package com.example.KTB_7WEEK.post.entity;
 
 
+import com.example.KTB_7WEEK.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.springframework.cglib.beans.BulkBean;
 
 import java.time.LocalDateTime;
 
@@ -14,11 +16,13 @@ public class Comment {
     @Column(name = "comment_id", nullable = false, unique = true)
     private Long id = 0L;
 
-    @Column(name = "post_id", nullable = false)
-    private Long postId = 0L;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    @Column(name = "author_id", nullable = false)
-    private Long authorId = 0L;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User author;
 
     @Column(name = "content", nullable = false, length = 200)
     private String content = "";
@@ -37,8 +41,7 @@ public class Comment {
 
     public Comment(Builder builder) {
         this.id = builder.id;
-        this.postId = builder.postId;
-        this.authorId = builder.authorId;
+        this.author = builder.author;
         this.content = builder.content;
     }
 
@@ -62,10 +65,22 @@ public class Comment {
         this.isDeleted = true;
     }
 
+    // 연관관계 편의 메소드 Post
+    public void onPost(Post post) {
+        this.post = post;
+        post.getComments().add(this);
+    }
+
+    // 연결관계 편의 메소드 User
+    public void writeBy(User author) {
+        this.author = author;
+        author.getComments().add(this); // 동기화하는 과정에서 동시성 문제 없나?
+    }
+
     public static class Builder {
         private Long id = 0L;
-        private Long postId = 0L;
-        private Long authorId = 0L;
+        private Post post = new Post();
+        private User author = new User();
         private String content = "";
 
         public Builder id(long id) {
@@ -73,13 +88,13 @@ public class Comment {
             return this;
         }
 
-        public Builder postId(long postId) {
-            this.postId = postId;
+        public Builder post(Post post) {
+            this.post = post;
             return this;
         }
 
-        public Builder authorId(long authorId) {
-            this.authorId = authorId;
+        public Builder author(User author) {
+            this.author = author;
             return this;
         }
 

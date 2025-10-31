@@ -7,15 +7,15 @@ import com.example.KTB_7WEEK.auth.dto.request.LoginRequestDto;
 import com.example.KTB_7WEEK.auth.dto.response.LoginResponseDto;
 import com.example.KTB_7WEEK.user.entity.User;
 import com.example.KTB_7WEEK.user.exception.UserNotFoundException;
-import com.example.KTB_7WEEK.user.repository.user.PublicUserRepository;
+import com.example.KTB_7WEEK.user.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-    private final PublicUserRepository publicUserRepository;
+    private final UserRepository userRepository;
 
-    public AuthService(PublicUserRepository publicUserRepository) {
-        this.publicUserRepository = publicUserRepository;
+    public AuthService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Loggable
@@ -24,7 +24,7 @@ public class AuthService {
         String password = req.getPassword();
         boolean isLoginSuccess = false;
 
-        User user =publicUserRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException());
+        User user =userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException());
 
         if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
             isLoginSuccess = true;

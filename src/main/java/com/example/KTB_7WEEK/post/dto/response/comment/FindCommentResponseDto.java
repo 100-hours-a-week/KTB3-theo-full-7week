@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class FindCommentResponseDto {
     private long id;
-    private long userId;
+    private long authorId;
     private String content;
     private String created_at;
     private String updated_at;
@@ -19,8 +19,8 @@ public class FindCommentResponseDto {
         return id;
     }
 
-    public long getUserId() {
-        return userId;
+    public long getAuthorId() {
+        return authorId;
     }
 
     public String getContent() {
@@ -38,7 +38,7 @@ public class FindCommentResponseDto {
     public static FindCommentResponseDto toDto(Comment comment) {
         FindCommentResponseDto dto = new FindCommentResponseDto();
         dto.id = comment.getId();
-        dto.userId = comment.getAuthorId();
+        dto.authorId = comment.getAuthor().getId();
         dto.content = comment.getContent();
         dto.created_at = comment.getCreatedAt()
                 .format(DateTimeFormatter.ofPattern(DateTimePattern.DEFAULT_DATE_TIME));

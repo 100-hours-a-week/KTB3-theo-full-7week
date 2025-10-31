@@ -5,25 +5,21 @@ import com.example.KTB_7WEEK.app.aop.aspect.log.Loggable;
 import com.example.KTB_7WEEK.app.response.BaseResponse;
 import com.example.KTB_7WEEK.app.response.ResponseMessage;
 import com.example.KTB_7WEEK.user.entity.User;
-import com.example.KTB_7WEEK.user.repository.user.PublicUserRepository;
+import com.example.KTB_7WEEK.user.repository.user.UserRepository;
 import com.example.KTB_7WEEK.user.dto.request.*;
 import com.example.KTB_7WEEK.user.dto.response.*;
 import com.example.KTB_7WEEK.user.exception.*;
-import com.fasterxml.jackson.databind.util.ExceptionUtil;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional
-public class PublicUserService {
-    private final PublicUserRepository publicUserRepository;
+public class UserService {
+    private final UserRepository publicUserRepository;
 
     // 생성자 DI
-    public PublicUserService(PublicUserRepository publicUserRepository) {
+    public UserService(UserRepository publicUserRepository) {
         this.publicUserRepository = publicUserRepository;
     }
 

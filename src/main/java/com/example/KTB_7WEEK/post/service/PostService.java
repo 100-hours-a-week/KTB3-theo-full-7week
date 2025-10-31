@@ -19,7 +19,7 @@ import com.example.KTB_7WEEK.post.dto.request.CreatePostRequestDto;
 import com.example.KTB_7WEEK.post.entity.Post;
 import com.example.KTB_7WEEK.app.util.paginationPolicy.CommentPaginationPolicy;
 import com.example.KTB_7WEEK.app.util.paginationPolicy.PostPaginationPolicy;
-import com.example.KTB_7WEEK.post.repository.PublicPostJpaRepository;
+import com.example.KTB_7WEEK.post.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,12 +30,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class PublicPostService {
-    private final PublicPostJpaRepository publicPostJpaRepository;
+public class PostService {
+    private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    public PublicPostService(PublicPostJpaRepository publicPostJpaRepository, CommentRepository commentRepository) {
-        this.publicPostJpaRepository = publicPostJpaRepository;
+    public PostService(PostRepository postRepository,
+                       CommentRepository commentRepository) {
+        this.postRepository = postRepository;
         this.commentRepository = commentRepository;
     }
 
@@ -53,7 +54,7 @@ public class PublicPostService {
                 .category(req.getCategory())
                 .build();
 
-        Post saved = publicPostJpaRepository.save(toSave);
+        Post saved = postRepository.save(toSave);
         return new BaseResponse(ResponseMessage.POST_REGISTER_SUCCESS, CreatePostResponseDto.toDto(saved.getId()));
     }
 
@@ -61,7 +62,7 @@ public class PublicPostService {
     // TODO: JPA 페이지네이션 구현
     @Loggable
     public BaseResponse<FindPostsResponseDto> findPosts(int page) {
-        List<Post> posts = publicPostJpaRepository.findAll();
+        List<Post> posts = postRepository.findAll();
         int totalPages = posts.size() / PostPaginationPolicy.DEFAULT.limit();
         totalPages = posts.size() % PostPaginationPolicy.DEFAULT.limit() > 0 ?
                 totalPages + 1 : totalPages;
@@ -86,14 +87,14 @@ public class PublicPostService {
     // 게시글 조회
     @Loggable
     public BaseResponse<FindPostResponseDto> findPostById(long id) {
-        Post post = publicPostJpaRepository.findById(id).orElseThrow(() -> new PostNotFoundException());
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException());
         return new BaseResponse(ResponseMessage.POST_INFO_LOAD_SUCCESS, FindPostResponseDto.toDto(post));
     }
 
     // My Post 수정
     @Loggable
     public BaseResponse<UpdateMyPostResponseDto> updateMyPost(long id, UpdateMyPostRequestDto req) {
-        Post toUpdate = publicPostJpaRepository.findById(id).orElseThrow(() -> new PostNotFoundException());
+        Post toUpdate = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException());
 
         toUpdate.updateTitle(req.getTitle());
         toUpdate.updateArticle(req.getArticle());
@@ -108,10 +109,10 @@ public class PublicPostService {
     // 게시글 삭제 By Id
     @Loggable
     public BaseResponse deletePostById(long id) {
-        if (publicPostJpaRepository.existsById(id)) {
+        if (postRepository.existsById(id)) {
             throw new PostNotFoundException();
         }
-        publicPostJpaRepository.deleteById(id);
+        postRepository.deleteById(id);
 
         return new BaseResponse(ResponseMessage.POST_DELETE_SUCCESS, new Post());
     }
@@ -121,7 +122,7 @@ public class PublicPostService {
     public BaseResponse<IncreaseHitResponseDto> increaseHit(long id) {
 //        Post toUpdate = postRepository.findPostById(id).orElseThrow(() -> new PostNotFoundException());
 
-        Post toUpdate = publicPostJpaRepository.findById(id).orElseThrow(() -> new PostNotFoundException());
+        Post toUpdate = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException());
         toUpdate.increaseHit();
 
         return new BaseResponse(ResponseMessage.INCREASE_HIT_SUCCESS,
@@ -131,7 +132,7 @@ public class PublicPostService {
     // 게시글 좋아요 수 증가
     @Loggable
     public BaseResponse<IncreaseLikeResponseDto> increaseLike(long id) {
-        Post toUpdate = publicPostJpaRepository.findById(id).orElseThrow(() -> new PostNotFoundException());
+        Post toUpdate = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException());
         toUpdate.increaseLike();
 
         return new BaseResponse(ResponseMessage.INCREASE_LIKE_SUCCESS,
@@ -141,12 +142,13 @@ public class PublicPostService {
     // 댓글 등록
     @Loggable
     public BaseResponse<CreateCommentResponseDto> createComment(long postId, CreateCommentRequestDto req) {
-        if (publicPostJpaRepository.existsById(postId)) {
+        if (postRepository.existsById(postId)) {
             throw new PostNotFoundException();
         }
+        Post findPost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException());
         Comment toSave = new Comment.Builder()
-                .authorId(req.getUserId())
-                .postId(postId)
+                .author(findPost.getUser())
+                .post(findPost)
                 .content(req.getContent())
                 .build();
         Comment saved = commentRepository.save(toSave);
@@ -158,7 +160,7 @@ public class PublicPostService {
     // 댓글 조회 By Post Id
     @Loggable
     public BaseResponse<FindCommentsResponseDto> findCommentByPostId(long postId, int page) {
-        if (publicPostJpaRepository.existsById(postId)) {
+        if (postRepository.existsById(postId)) {
             throw new PostNotFoundException();
         }
 
@@ -194,7 +196,7 @@ public class PublicPostService {
     // 댓글 수정 By Comment Id
     @Loggable
     public BaseResponse<UpdateCommentResponseDto> updateCommentById(long postId, long commentId, UpdateCommentRequestDto req) {
-        if (publicPostJpaRepository.existsById(postId)) {
+        if (postRepository.existsById(postId)) {
             throw new PostNotFoundException();
         }
 
@@ -212,7 +214,7 @@ public class PublicPostService {
     // 댓글 삭제
     @Loggable
     public BaseResponse deleteCommentById(long postId, long commentId) {
-        if (publicPostJpaRepository.existsById(postId)) {
+        if (postRepository.existsById(postId)) {
             throw new PostNotFoundException();
         }
         commentRepository.deleteById(commentId);

@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Entity
@@ -51,6 +53,9 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany
+    private List<Comment> comments = new ArrayList<>();
 
     public Post() {
     }

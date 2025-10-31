@@ -1,5 +1,6 @@
 package com.example.KTB_7WEEK.user.entity;
 
+import com.example.KTB_7WEEK.post.entity.Comment;
 import com.example.KTB_7WEEK.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -37,8 +38,11 @@ public class User {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user") // 읽기 조회용
     private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author") // 읽기 조회용
+    private List<Comment> comments = new ArrayList<>();
 
     public User() {
     }

@@ -2,7 +2,7 @@ package com.example.KTB_7WEEK.user.controller;
 
 import com.example.KTB_7WEEK.swagger.controller.user.UserApiDoc;
 import com.example.KTB_7WEEK.app.response.BaseResponse;
-import com.example.KTB_7WEEK.user.service.PublicUserService;
+import com.example.KTB_7WEEK.user.service.UserService;
 import com.example.KTB_7WEEK.user.dto.request.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class PublicUserController implements UserApiDoc {
 
-    private final PublicUserService publicUserService;
+    private final UserService publicUserService;
 
-    public PublicUserController(PublicUserService publicUserService) {
+    public PublicUserController(UserService publicUserService) {
         this.publicUserService = publicUserService;
     }
 

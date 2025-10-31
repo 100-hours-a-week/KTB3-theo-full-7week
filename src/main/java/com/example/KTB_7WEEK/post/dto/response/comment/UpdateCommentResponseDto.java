@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 public class UpdateCommentResponseDto {
     private long id;
     private long postId;
-    private long userId;
+    private long authorId;
     private String content;
     private String createAt;
     private String updateAt;
@@ -24,8 +24,8 @@ public class UpdateCommentResponseDto {
         return postId;
     }
 
-    public long getUserId() {
-        return userId;
+    public long getAuthorId() {
+        return authorId;
     }
 
     public String getContent() {
@@ -43,8 +43,8 @@ public class UpdateCommentResponseDto {
     public static UpdateCommentResponseDto toDto(Comment comment) {
         UpdateCommentResponseDto dto = new UpdateCommentResponseDto();
         dto.id = comment.getId();
-        dto.postId = comment.getPostId();
-        dto.userId = comment.getAuthorId();
+        dto.postId = comment.getPost().getId();
+        dto.authorId = comment.getAuthor().getId();
         dto.content = comment.getContent();
         dto.createAt = comment.getCreatedAt()
                 .format(DateTimeFormatter.ofPattern(DateTimePattern.DEFAULT_DATE_TIME));
